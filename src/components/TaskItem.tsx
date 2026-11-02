@@ -16,7 +16,9 @@ export const TaskItem = ({ task, onToggle, onDelete }: TaskItemProps) => {
             {task.description && <p className="task-item__desc">{task.description}</p>}
 
             <div className="task-item__meta">
-                <span className="task-item__badge">Пріоритет: {task.priority}</span>
+                <span className={`task-item__badge task-item__badge--${task.priority}`}>
+                    {task.priority === 'high' ? ' Високий' : task.priority === 'medium' ? ' Середній' : ' Низький'}
+                </span>
                 {task.category && <span className="task-item__badge">Категорія: {task.category}</span>}
             </div>
         </div>

@@ -183,3 +183,26 @@
 .task-item__btn--danger:hover {
     background: #fff5f5;
 }
+
+.task-item__badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.task-item__badge--low {
+    background-color: #c6f6d5;
+    color: #22543d;
+}
+
+.task-item__badge--medium {
+    background-color: #fefcbf;
+    color: #744210;
+}
+
+.task-item__badge--high {
+    background-color: #fed7d7;
+    color: #742a2a;
+}
