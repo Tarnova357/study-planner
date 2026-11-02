@@ -11,6 +11,7 @@ import './App.scss';
 function App() {
     const [tasks, setTasks] = useState<Task[]>(initialTasks);
     const [filter, setFilter] = useState<FilterType>('all');
+    const [isDarkTheme, setIsDarkTheme] = useState(false);
 
     const addTask = (newTaskData: Omit<Task, 'id' | 'completed'>) => {
         const newTask: Task = {
@@ -40,19 +41,21 @@ function App() {
     });
 
     return (
-        <div className="app-container">
-            <Header />
-            <main className="main-content">
-                <TaskStats tasks={tasks} />
-                <TaskForm onAdd={addTask} />
-                <TaskFilters currentFilter={filter} onFilterChange={setFilter} />
-                <TaskList
-                    tasks={filteredTasks}
-                    currentFilter={filter}
-                    onToggle={toggleTask}
-                    onDelete={deleteTask}
-                />
-            </main>
+        <div className="app-wrapper" data-theme={isDarkTheme ? 'dark' : 'light'}>
+            <div className="app-container">
+                <Header isDark={isDarkTheme} onToggleTheme={() => setIsDarkTheme(!isDarkTheme)} />
+                <main className="main-content">
+                    <TaskStats tasks={tasks} />
+                    <TaskForm onAdd={addTask} />
+                    <TaskFilters currentFilter={filter} onFilterChange={setFilter} />
+                    <TaskList
+                        tasks={filteredTasks}
+                        currentFilter={filter}
+                        onToggle={toggleTask}
+                        onDelete={deleteTask}
+                    />
+                </main>
+            </div>
         </div>
     );
 }

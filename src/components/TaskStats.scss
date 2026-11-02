@@ -1,0 +1,9 @@
+.task-stats {
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--stats-bg);
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  color: var(--text-main);
+}

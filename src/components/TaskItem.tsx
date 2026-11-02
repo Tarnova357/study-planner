@@ -1,4 +1,6 @@
 import type {Task} from '../types/task';
+import './TaskItem.scss';
+
 
 interface TaskItemProps {
     task: Task;

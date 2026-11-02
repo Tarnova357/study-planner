@@ -1,8 +1,8 @@
-// src/components/TaskList.tsx
-// src/components/TaskList.tsx
 import type {Task} from '../types/task';
 import { TaskItem } from './TaskItem';
 import type {FilterType} from './TaskFilters';
+
+import './TaskList.scss';
 
 interface TaskListProps {
     tasks: Task[];

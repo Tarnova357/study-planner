@@ -1,4 +1,5 @@
 import type {Task} from '../types/task';
+import './TaskStats.scss';
 
 interface TaskStatsProps {
     tasks: Task[];

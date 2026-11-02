@@ -1,5 +1,6 @@
 import {useState, type FormEvent} from 'react';
 import type {Priority, Task} from '../types/task';
+import './TaskForm.scss';
 
 interface TaskFormProps {
     onAdd: (task: Omit<Task, 'id' | 'completed'>) => void;

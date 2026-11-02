@@ -1,4 +1,6 @@
 export type FilterType = 'all' | 'completed' | 'uncompleted';
+import './TaskFilters.scss';
+
 
 interface TaskFiltersProps {
     currentFilter: FilterType;
