@@ -1,5 +1,4 @@
 import {
-    createContext,
     useReducer,
     useEffect,
     useState,
@@ -20,29 +19,10 @@ import {
 } from '../reducers/taskReducer';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { initialTasks } from '../data/initialTasks';
+import { TaskContext } from './TaskContext';
 
 const UNDO_DURATION_MS = 5000;
 const TOAST_DURATION_MS = 3000;
-
-export interface TaskContextValue {
-    tasks: Task[];
-    pendingDeleteId: number | null;
-    filter: FilterType;
-    setFilter: (filter: FilterType) => void;
-    editingTask: Task | null;
-    startEditing: (task: Task) => void;
-    cancelEditing: () => void;
-    addTask: (data: TaskInput) => void;
-    updateTask: (id: number, data: TaskInput) => void;
-    toggleTask: (id: number) => void;
-    requestDelete: (id: number) => void;
-    undoDelete: () => void;
-    resetTasks: () => void;
-    toast: ToastMessage | null;
-    dismissToast: () => void;
-}
-
-export const TaskContext = createContext<TaskContextValue | undefined>(undefined);
 
 export const TaskProvider = ({ children }: { children: ReactNode }) => {
     const [state, dispatch] = useReducer(taskReducer, undefined, initTaskState);
@@ -69,7 +49,6 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     const dismissToast = useCallback(() => {
         setToast(null);
     }, []);
-
     useEffect(() => {
         try {
             window.localStorage.setItem(
