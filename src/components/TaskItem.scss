@@ -7,6 +7,7 @@
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   border-left: 5px solid var(--primary);
+  transition: opacity 0.2s ease, border-color 0.2s ease;
 
   &--completed {
     border-left-color: #48bb78;
@@ -15,6 +16,13 @@
       text-decoration: line-through;
       color: var(--text-muted);
     }
+  }
+
+  &--pending {
+    opacity: 0.55;
+    border-left-color: #e53e3e;
+    border-style: dashed;
+    border-width: 1px 1px 1px 5px;
   }
 
   &__content { flex: 1; }
@@ -30,7 +38,11 @@
     color: var(--text-muted);
   }
 
-  &__meta { display: flex; gap: 1rem; }
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
 
   &__badge {
     font-size: 0.75rem;
@@ -43,6 +55,7 @@
     &--low { background-color: #c6f6d5; color: #22543d; }
     &--medium { background-color: #fefcbf; color: #744210; }
     &--high { background-color: #fed7d7; color: #742a2a; }
+    &--pending { background-color: #fed7d7; color: #9b2c2c; }
   }
 
   &__actions {
@@ -60,9 +73,20 @@
     border-radius: 4px;
     cursor: pointer;
 
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     &--danger {
       color: #e53e3e;
       border-color: #e53e3e;
+    }
+
+    &--undo {
+      color: var(--primary);
+      border-color: var(--primary);
+      font-weight: 600;
     }
   }
 }

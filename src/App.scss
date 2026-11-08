@@ -34,3 +34,26 @@
   flex-direction: column;
   gap: 1.5rem;
 }
+
+.app-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.app-reset-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background-color: var(--bg-surface);
+  color: var(--text-muted);
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #e53e3e;
+    color: #e53e3e;
+  }
+}

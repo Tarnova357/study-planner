@@ -1,22 +1,20 @@
-import type {Task} from '../types/task';
 import { TaskItem } from './TaskItem';
-import type {FilterType} from './TaskFilters';
-
+import { useTaskContext } from '../hooks/useTaskContext';
 import './TaskList.scss';
 
-interface TaskListProps {
-    tasks: Task[];
-    currentFilter: FilterType;
-    onToggle: (id: number) => void;
-    onDelete: (id: number) => void;
-}
+export const TaskList = () => {
+    const { tasks, filter } = useTaskContext();
 
-export const TaskList = ({ tasks, currentFilter, onToggle, onDelete }: TaskListProps) => {
+    const filteredTasks = tasks.filter((task) => {
+        if (filter === 'completed') return task.completed;
+        if (filter === 'uncompleted') return !task.completed;
+        return true;
+    });
 
-    if (tasks.length === 0) {
+    if (filteredTasks.length === 0) {
         return (
             <div className="task-list__empty">
-                {currentFilter === 'all'
+                {filter === 'all'
                     ? 'Завдань поки немає.\nДодайте перше навчальне завдання.'
                     : 'За цим фільтром завдань немає.'}
             </div>
@@ -25,13 +23,8 @@ export const TaskList = ({ tasks, currentFilter, onToggle, onDelete }: TaskListP
 
     return (
         <div className="task-list">
-            {tasks.map((task) => (
-                <TaskItem
-                    key={task.id}
-                    task={task}
-                    onToggle={onToggle}
-                    onDelete={onDelete}
-                />
+            {filteredTasks.map((task) => (
+                <TaskItem key={task.id} task={task} />
             ))}
         </div>
     );

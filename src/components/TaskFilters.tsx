@@ -1,30 +1,26 @@
-export type FilterType = 'all' | 'completed' | 'uncompleted';
+import { useTaskContext } from '../hooks/useTaskContext';
 import './TaskFilters.scss';
 
+export const TaskFilters = () => {
+    const { filter, setFilter } = useTaskContext();
 
-interface TaskFiltersProps {
-    currentFilter: FilterType;
-    onFilterChange: (filter: FilterType) => void;
-}
-
-export const TaskFilters = ({ currentFilter, onFilterChange }: TaskFiltersProps) => {
     return (
         <div className="task-filters">
             <button
-                className={`task-filters__btn ${currentFilter === 'all' ? 'task-filters__btn--active' : ''}`}
-                onClick={() => onFilterChange('all')}
+                className={`task-filters__btn ${filter === 'all' ? 'task-filters__btn--active' : ''}`}
+                onClick={() => setFilter('all')}
             >
                 Всі
             </button>
             <button
-                className={`task-filters__btn ${currentFilter === 'completed' ? 'task-filters__btn--active' : ''}`}
-                onClick={() => onFilterChange('completed')}
+                className={`task-filters__btn ${filter === 'completed' ? 'task-filters__btn--active' : ''}`}
+                onClick={() => setFilter('completed')}
             >
                 Виконані
             </button>
             <button
-                className={`task-filters__btn ${currentFilter === 'uncompleted' ? 'task-filters__btn--active' : ''}`}
-                onClick={() => onFilterChange('uncompleted')}
+                className={`task-filters__btn ${filter === 'uncompleted' ? 'task-filters__btn--active' : ''}`}
+                onClick={() => setFilter('uncompleted')}
             >
                 Не виконані
             </button>
