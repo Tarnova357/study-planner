@@ -1,0 +1,98 @@
+.toast {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 1000;
+  min-width: 280px;
+  max-width: 400px;
+  background-color: var(--bg-surface);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  border-left: 5px solid var(--primary);
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+
+  &--success {
+    border-left-color: #48bb78;
+  }
+
+  &--info {
+    border-left-color: var(--primary);
+  }
+
+  &--error {
+    border-left-color: #e53e3e;
+  }
+
+  &__body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.875rem 1rem;
+  }
+
+  &__message {
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  &__undo-btn {
+    padding: 0.35rem 0.75rem;
+    border: 1px solid var(--primary);
+    border-radius: 4px;
+    background-color: transparent;
+    color: var(--primary);
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--primary);
+      color: #ffffff;
+    }
+  }
+
+  &__close-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--text-main);
+    }
+  }
+
+  &__progress {
+    width: 100%;
+    height: 4px;
+    background-color: var(--stats-bg);
+  }
+
+  &__progress-bar {
+    height: 100%;
+    width: 100%;
+    background-color: var(--primary);
+    transform-origin: left;
+    animation: toast-countdown linear forwards;
+  }
+}
+
+@keyframes toast-countdown {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
