@@ -1,6 +1,7 @@
-import { useState } from 'react';
 import { TaskProvider } from './context/TaskProvider';
+import { ThemeProvider } from './context/ThemeProvider';
 import { useTaskContext } from './hooks/useTaskContext';
+import { useTheme } from './hooks/useTheme';
 import { Header } from './components/Header';
 import { TaskStats } from './components/TaskStats';
 import { TaskForm } from './components/TaskForm';
@@ -10,16 +11,13 @@ import { Toast } from './components/Toast';
 import './App.scss';
 
 const AppContent = () => {
-    const [isDarkTheme, setIsDarkTheme] = useState(false);
+    const { theme } = useTheme();
     const { editingTask, resetTasks } = useTaskContext();
 
     return (
-        <div className="app-wrapper" data-theme={isDarkTheme ? 'dark' : 'light'}>
+        <div className="app-wrapper" data-theme={theme}>
             <div className="app-container">
-                <Header
-                    isDark={isDarkTheme}
-                    onToggleTheme={() => setIsDarkTheme((prev) => !prev)}
-                />
+                <Header />
                 <main className="main-content">
                     <TaskStats />
                     <TaskForm key={editingTask?.id ?? 'new'} />
@@ -43,9 +41,11 @@ const AppContent = () => {
 
 function App() {
     return (
-        <TaskProvider>
-            <AppContent />
-        </TaskProvider>
+        <ThemeProvider>
+            <TaskProvider>
+                <AppContent />
+            </TaskProvider>
+        </ThemeProvider>
     );
 }
 
