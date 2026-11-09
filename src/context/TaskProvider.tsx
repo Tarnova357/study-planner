@@ -51,10 +51,10 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     }, []);
     useEffect(() => {
         try {
-            window.localStorage.setItem(
-                TASKS_STORAGE_KEY,
-                JSON.stringify(state.tasks)
-            );
+            const serialized = JSON.stringify(state.tasks);
+            if (window.localStorage.getItem(TASKS_STORAGE_KEY) !== serialized) {
+                window.localStorage.setItem(TASKS_STORAGE_KEY, serialized);
+            }
         } catch (error) {
             console.warn('Не вдалося зберегти завдання в localStorage:', error);
         }
@@ -90,6 +90,36 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
             window.clearTimeout(timerId);
         };
     }, [toast]);
+
+    useEffect(() => {
+        const handleStorage = (event: StorageEvent) => {
+            if (event.key !== null && event.key !== TASKS_STORAGE_KEY) return;
+
+            if (event.key === null || event.newValue === null) {
+                dispatch({ type: 'syncFromStorage', payload: initialTasks });
+                setEditingTask(null);
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(event.newValue) as unknown;
+                if (Array.isArray(parsed)) {
+                    const nextTasks = parsed as Task[];
+                    dispatch({ type: 'syncFromStorage', payload: nextTasks });
+                    setEditingTask((prev) =>
+                        prev ? nextTasks.find((t) => t.id === prev.id) ?? null : null
+                    );
+                }
+            } catch (error) {
+                console.warn('Помилка синхронізації завдань між вкладками:', error);
+            }
+        };
+
+        window.addEventListener('storage', handleStorage);
+        return () => {
+            window.removeEventListener('storage', handleStorage);
+        };
+    }, []);
 
     const addTask = useCallback(
         (data: TaskInput) => {

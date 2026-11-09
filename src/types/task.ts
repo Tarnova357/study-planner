@@ -35,4 +35,5 @@ export type TaskAction =
     | { type: 'requestDelete'; payload: { id: number } }
     | { type: 'confirmDelete'; payload: { id: number } }
     | { type: 'undoDelete' }
-    | { type: 'reset'; payload: Task[] };
+    | { type: 'reset'; payload: Task[] }
+    | { type: 'syncFromStorage'; payload: Task[] };

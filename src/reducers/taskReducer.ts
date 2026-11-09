@@ -90,7 +90,16 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
                 pendingDeleteId: null,
             };
         }
-
+        case 'syncFromStorage': {
+            return {
+                tasks: action.payload,
+                pendingDeleteId:
+                    state.pendingDeleteId &&
+                    action.payload.some((task) => task.id === state.pendingDeleteId)
+                        ? state.pendingDeleteId
+                        : null,
+            };
+        }
         default:
             return state;
     }
