@@ -8,18 +8,28 @@ import type {
 
 export interface TaskContextValue {
     tasks: Task[];
-    pendingDeleteId: number | null;
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    isLoading: boolean;
+    error: string | null;
+    isSubmitting: boolean;
+    mutatingTaskId: number | null;
     filter: FilterType;
     setFilter: (filter: FilterType) => void;
+    setPage: (page: number) => void;
+    retryFetch: () => void;
     editingTask: Task | null;
     startEditing: (task: Task) => void;
     cancelEditing: () => void;
-    addTask: (data: TaskInput) => void;
-    updateTask: (id: number, data: TaskInput) => void;
-    toggleTask: (id: number) => void;
-    requestDelete: (id: number) => void;
-    undoDelete: () => void;
-    resetTasks: () => void;
+    selectedTaskId: number | null;
+    selectTask: (id: number) => void;
+    closeTaskDetails: () => void;
+    addTask: (data: TaskInput) => Promise<boolean>;
+    updateTask: (id: number, data: TaskInput) => Promise<boolean>;
+    toggleTask: (task: Task) => Promise<void>;
+    deleteTask: (id: number) => Promise<void>;
     toast: ToastMessage | null;
     dismissToast: () => void;
 }
