@@ -1,0 +1,33 @@
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+
+  &__btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background-color: var(--bg-surface);
+    color: var(--text-main);
+    font-weight: 500;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__info {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+}

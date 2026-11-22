@@ -7,12 +7,14 @@ import { TaskStats } from './components/TaskStats';
 import { TaskForm } from './components/TaskForm';
 import { TaskFilters } from './components/TaskFilters';
 import { TaskList } from './components/TaskList';
+import { Pagination } from './components/Pagination';
+import { TaskDetails } from './components/TaskDetails';
 import { Toast } from './components/Toast';
 import './App.scss';
 
 const AppContent = () => {
     const { theme } = useTheme();
-    const { editingTask, resetTasks } = useTaskContext();
+    const { editingTask, selectedTaskId, closeTaskDetails } = useTaskContext();
 
     return (
         <div className="app-wrapper" data-theme={theme}>
@@ -23,17 +25,18 @@ const AppContent = () => {
                     <TaskForm key={editingTask?.id ?? 'new'} />
                     <div className="app-toolbar">
                         <TaskFilters />
-                        <button
-                            type="button"
-                            className="app-reset-btn"
-                            onClick={resetTasks}
-                        >
-                            Скинути дані
-                        </button>
                     </div>
                     <TaskList />
+                    <Pagination />
                 </main>
             </div>
+            {selectedTaskId !== null && (
+                <TaskDetails
+                    key={selectedTaskId}
+                    taskId={selectedTaskId}
+                    onClose={closeTaskDetails}
+                />
+            )}
             <Toast />
         </div>
     );

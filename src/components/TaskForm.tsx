@@ -4,7 +4,8 @@ import { useTaskContext } from '../hooks/useTaskContext';
 import './TaskForm.scss';
 
 export const TaskForm = () => {
-    const { editingTask, addTask, updateTask, cancelEditing } = useTaskContext();
+    const { editingTask, isSubmitting, addTask, updateTask, cancelEditing } =
+        useTaskContext();
     const isEditing = editingTask !== null;
 
     const [title, setTitle] = useState(editingTask?.title ?? '');
@@ -12,23 +13,23 @@ export const TaskForm = () => {
     const [category, setCategory] = useState(editingTask?.category ?? '');
     const [priority, setPriority] = useState<Priority>(editingTask?.priority ?? 'medium');
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
         const payload = {
             title: title.trim(),
             description: description.trim(),
-            category: category.trim(),
+            category: category.trim() || 'General',
             priority,
         };
 
         if (isEditing) {
-            updateTask(editingTask.id, payload);
+            await updateTask(editingTask.id, payload);
             return;
         }
 
-        addTask(payload);
-        if (payload.title) {
+        const created = await addTask(payload);
+        if (created) {
             setTitle('');
             setDescription('');
             setCategory('');
@@ -48,6 +49,7 @@ export const TaskForm = () => {
                 placeholder="Назва завдання *"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                disabled={isSubmitting}
                 required
             />
             <input
@@ -55,17 +57,20 @@ export const TaskForm = () => {
                 placeholder="Опис"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+                disabled={isSubmitting}
             />
             <input
                 className="task-form__input"
                 placeholder="Категорія"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
+                disabled={isSubmitting}
             />
             <select
                 className="task-form__select"
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as Priority)}
+                disabled={isSubmitting}
             >
                 <option value="low">Низький</option>
                 <option value="medium">Середній</option>
@@ -73,14 +78,19 @@ export const TaskForm = () => {
             </select>
 
             <div className="task-form__actions">
-                <button className="task-form__btn" type="submit">
-                    {isEditing ? 'Зберегти зміни' : 'Додати'}
+                <button className="task-form__btn" type="submit" disabled={isSubmitting}>
+                    {isSubmitting
+                        ? 'Збереження...'
+                        : isEditing
+                            ? 'Зберегти зміни'
+                            : 'Додати'}
                 </button>
                 {isEditing && (
                     <button
                         className="task-form__btn task-form__btn--secondary"
                         type="button"
                         onClick={cancelEditing}
+                        disabled={isSubmitting}
                     >
                         Скасувати
                     </button>
