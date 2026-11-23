@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Navigate, useNavigate } from 'react-router';
+import { Navigate, useLocation, useNavigate, type Location } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { authSchema, type LoginFormData } from '../schemas/authSchema';
@@ -7,11 +7,21 @@ import { useAuth } from '../hooks/useAuth';
 import { useTaskContext } from '../hooks/useTaskContext';
 import './LoginPage.scss';
 
+interface LoginLocationState {
+    from?: Location;
+}
+
 export const LoginPage = () => {
     const { isAuthenticated, login } = useAuth();
     const { showToast } = useTaskContext();
     const navigate = useNavigate();
+    const location = useLocation();
     const [submitError, setSubmitError] = useState<string | null>(null);
+
+    const state = location.state as LoginLocationState | null;
+    const redirectTo = state?.from
+        ? `${state.from.pathname}${state.from.search}`
+        : '/profile';
 
     const {
         register,
@@ -26,7 +36,7 @@ export const LoginPage = () => {
     });
 
     if (isAuthenticated) {
-        return <Navigate to="/profile" replace />;
+        return <Navigate to={redirectTo} replace />;
     }
 
     const onSubmit = async (data: LoginFormData) => {
@@ -34,7 +44,7 @@ export const LoginPage = () => {
         try {
             await login(data);
             showToast('Вхід виконано успішно', 'success');
-            navigate('/profile', { replace: true });
+            navigate(redirectTo, { replace: true });
         } catch (err: unknown) {
             setSubmitError(
                 err instanceof Error ? err.message : 'Не вдалося виконати вхід'
