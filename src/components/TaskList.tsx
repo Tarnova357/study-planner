@@ -1,9 +1,15 @@
+import type { FilterType, PriorityFilterType } from '../types/task';
 import { TaskItem } from './TaskItem';
 import { useTaskContext } from '../hooks/useTaskContext';
 import './TaskList.scss';
 
-export const TaskList = () => {
-    const { tasks, filter, isLoading, error, retryFetch } = useTaskContext();
+interface TaskListProps {
+    status: FilterType;
+    priority: PriorityFilterType;
+}
+
+export const TaskList = ({ status, priority }: TaskListProps) => {
+    const { tasks, isLoading, error, retryFetch } = useTaskContext();
 
     if (isLoading) {
         return <div className="task-list__state">Loading...</div>;
@@ -25,9 +31,14 @@ export const TaskList = () => {
     }
 
     const filteredTasks = tasks.filter((task) => {
-        if (filter === 'completed') return task.completed;
-        if (filter === 'uncompleted') return !task.completed;
-        return true;
+        const matchesStatus =
+            status === 'all' ||
+            (status === 'completed' && task.completed) ||
+            (status === 'uncompleted' && !task.completed);
+
+        const matchesPriority = priority === 'all' || task.priority === priority;
+
+        return matchesStatus && matchesPriority;
     });
 
     if (filteredTasks.length === 0) {

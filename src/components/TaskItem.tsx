@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router';
 import type { Task } from '../types/task';
+import { useAuth } from '../hooks/useAuth';
 import { useTaskContext } from '../hooks/useTaskContext';
 import './TaskItem.scss';
 
@@ -8,18 +10,35 @@ interface TaskItemProps {
 }
 
 export const TaskItem = ({ task }: TaskItemProps) => {
-    const {
-        mutatingTaskId,
-        toggleTask,
-        deleteTask,
-        startEditing,
-        selectTask,
-    } = useTaskContext();
+    const { isAuthenticated } = useAuth();
+    const { mutatingTaskId, toggleTask, deleteTask, showToast } = useTaskContext();
+    const navigate = useNavigate();
+    const location = useLocation();
 
     const [confirmingDelete, setConfirmingDelete] = useState(false);
     const isBusy = mutatingTaskId === task.id;
 
+    const requireAuth = (message: string): boolean => {
+        if (!isAuthenticated) {
+            showToast(message, 'info');
+            navigate('/login', { state: { from: location } });
+            return false;
+        }
+        return true;
+    };
+
+    const handleToggle = async () => {
+        if (!requireAuth('Увійдіть, щоб змінити статус завдання')) return;
+        await toggleTask(task);
+    };
+
+    const handleStartDelete = () => {
+        if (!requireAuth('Увійдіть, щоб видалити завдання')) return;
+        setConfirmingDelete(true);
+    };
+
     const handleConfirmDelete = async () => {
+        if (!requireAuth('Увійдіть, щоб видалити завдання')) return;
         await deleteTask(task.id);
         setConfirmingDelete(false);
     };
@@ -71,34 +90,24 @@ export const TaskItem = ({ task }: TaskItemProps) => {
                     </div>
                 ) : (
                     <>
-                        <button
-                            type="button"
-                            className="task-item__btn"
-                            onClick={() => selectTask(task.id)}
-                            disabled={isBusy}
+                        <Link
+                            to={`/tasks/${task.id}`}
+                            className="task-item__btn task-item__btn--link"
                         >
                             Деталі
-                        </button>
+                        </Link>
                         <button
                             type="button"
                             className="task-item__btn"
-                            onClick={() => toggleTask(task)}
+                            onClick={handleToggle}
                             disabled={isBusy}
                         >
                             {task.completed ? 'Відновити' : 'Виконати'}
                         </button>
                         <button
                             type="button"
-                            className="task-item__btn"
-                            onClick={() => startEditing(task)}
-                            disabled={isBusy}
-                        >
-                            Редагувати
-                        </button>
-                        <button
-                            type="button"
                             className="task-item__btn task-item__btn--danger"
-                            onClick={() => setConfirmingDelete(true)}
+                            onClick={handleStartDelete}
                             disabled={isBusy}
                         >
                             Видалити

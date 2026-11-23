@@ -1,0 +1,31 @@
+.tasks-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  &__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__add-btn {
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 50%;
+    background-color: var(--primary);
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    flex-shrink: 0;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+}

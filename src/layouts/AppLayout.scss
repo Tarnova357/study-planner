@@ -1,0 +1,36 @@
+.app-layout {
+  --bg-main: #f8f9fa;
+  --bg-surface: #ffffff;
+  --text-main: #2d3748;
+  --text-muted: #718096;
+  --border: #cbd5e0;
+  --primary: #3182ce;
+  --stats-bg: #e2e8f0;
+
+  &[data-theme='dark'] {
+    --bg-main: #1a202c;
+    --bg-surface: #2d3748;
+    --text-main: #f7fafc;
+    --text-muted: #a0aec0;
+    --border: #4a5568;
+    --primary: #4299e1;
+    --stats-bg: #4a5568;
+  }
+
+  min-height: 100vh;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  transition: background-color 0.3s, color 0.3s;
+
+  &__container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  &__main {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}
