@@ -1,9 +1,9 @@
 import { createContext } from 'react';
 import type {
-    FilterType,
     Task,
     TaskInput,
     ToastMessage,
+    ToastType,
 } from '../types/task';
 
 export interface TaskContextValue {
@@ -16,21 +16,14 @@ export interface TaskContextValue {
     error: string | null;
     isSubmitting: boolean;
     mutatingTaskId: number | null;
-    filter: FilterType;
-    setFilter: (filter: FilterType) => void;
     setPage: (page: number) => void;
     retryFetch: () => void;
-    editingTask: Task | null;
-    startEditing: (task: Task) => void;
-    cancelEditing: () => void;
-    selectedTaskId: number | null;
-    selectTask: (id: number) => void;
-    closeTaskDetails: () => void;
-    addTask: (data: TaskInput) => Promise<boolean>;
-    updateTask: (id: number, data: TaskInput) => Promise<boolean>;
-    toggleTask: (task: Task) => Promise<void>;
-    deleteTask: (id: number) => Promise<void>;
+    addTask: (data: TaskInput) => Promise<Task | null>;
+    updateTask: (id: number, data: TaskInput) => Promise<Task | null>;
+    toggleTask: (task: Task) => Promise<boolean>;
+    deleteTask: (id: number) => Promise<boolean>;
     toast: ToastMessage | null;
+    showToast: (message: string, type?: ToastType) => void;
     dismissToast: () => void;
 }
 

@@ -5,7 +5,6 @@ import {
     type ReactNode,
 } from 'react';
 import type {
-    FilterType,
     Task,
     TaskInput,
     ToastMessage,
@@ -13,13 +12,15 @@ import type {
 } from '../types/task';
 import { isAbortError } from '../api/httpClient';
 import { taskRepository } from '../repositories/taskRepository';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useAuth } from '../hooks/useAuth';
 import { TaskContext } from './TaskContext';
 
 const PAGE_LIMIT = 10;
 const TOAST_DURATION_MS = 3000;
 
 export const TaskProvider = ({ children }: { children: ReactNode }) => {
+    const { isAuthenticated, user } = useAuth();
+
     const [tasks, setTasks] = useState<Task[]>([]);
     const [total, setTotal] = useState(0);
     const [page, setPageState] = useState(1);
@@ -28,13 +29,6 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     const [reloadTrigger, setReloadTrigger] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [mutatingTaskId, setMutatingTaskId] = useState<number | null>(null);
-
-    const [filter, setFilter] = useLocalStorage<FilterType>(
-        'study-planner-filter',
-        'all'
-    );
-    const [editingTask, setEditingTask] = useState<Task | null>(null);
-    const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
     const [toast, setToast] = useState<ToastMessage | null>(null);
 
     const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
@@ -102,7 +96,6 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     const setPage = useCallback((nextPage: number) => {
         setIsLoading(true);
         setError(null);
-        setEditingTask(null);
         setPageState(nextPage);
     }, []);
 
@@ -113,37 +106,47 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const addTask = useCallback(
-        async (data: TaskInput): Promise<boolean> => {
+        async (data: TaskInput): Promise<Task | null> => {
+            if (!isAuthenticated || !user) {
+                showToast('Увійдіть, щоб створювати завдання', 'error');
+                return null;
+            }
+
             if (!data.title.trim()) {
                 showToast('Назва завдання не може бути порожньою', 'error');
-                return false;
+                return null;
             }
 
             setIsSubmitting(true);
             try {
-                const created = await taskRepository.create(data);
+                const created = await taskRepository.create(data, user.username);
                 setTasks((prev) => [created, ...prev]);
                 setTotal((prev) => prev + 1);
                 showToast('Завдання успішно створено', 'success');
-                return true;
+                return created;
             } catch (err: unknown) {
                 showToast(
                     err instanceof Error ? err.message : 'Помилка створення завдання',
                     'error'
                 );
-                return false;
+                return null;
             } finally {
                 setIsSubmitting(false);
             }
         },
-        [showToast]
+        [isAuthenticated, user, showToast]
     );
 
     const updateTask = useCallback(
-        async (id: number, data: TaskInput): Promise<boolean> => {
+        async (id: number, data: TaskInput): Promise<Task | null> => {
+            if (!isAuthenticated) {
+                showToast('Увійдіть, щоб редагувати завдання', 'error');
+                return null;
+            }
+
             if (!data.title.trim()) {
                 showToast('Назва завдання не може бути порожньою', 'error');
-                return false;
+                return null;
             }
 
             setIsSubmitting(true);
@@ -163,25 +166,29 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
                             : task
                     )
                 );
-                setEditingTask(null);
                 showToast('Завдання успішно оновлено', 'success');
-                return true;
+                return updated;
             } catch (err: unknown) {
                 showToast(
                     err instanceof Error ? err.message : 'Помилка оновлення завдання',
                     'error'
                 );
-                return false;
+                return null;
             } finally {
                 setIsSubmitting(false);
                 setMutatingTaskId(null);
             }
         },
-        [showToast]
+        [isAuthenticated, showToast]
     );
 
     const toggleTask = useCallback(
-        async (task: Task): Promise<void> => {
+        async (task: Task): Promise<boolean> => {
+            if (!isAuthenticated) {
+                showToast('Увійдіть, щоб змінювати статус завдання', 'error');
+                return false;
+            }
+
             const previousCompleted = task.completed;
             const nextCompleted = !previousCompleted;
 
@@ -197,6 +204,7 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
                 await taskRepository.update(task.id, {
                     completed: nextCompleted,
                 });
+                return true;
             } catch (err: unknown) {
                 setTasks((prev) =>
                     prev.map((item) =>
@@ -209,52 +217,38 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
                     err instanceof Error ? err.message : 'Помилка оновлення статусу',
                     'error'
                 );
+                return false;
             }
         },
-        [showToast]
+        [isAuthenticated, showToast]
     );
 
     const deleteTask = useCallback(
-        async (id: number): Promise<void> => {
+        async (id: number): Promise<boolean> => {
+            if (!isAuthenticated) {
+                showToast('Увійдіть, щоб видаляти завдання', 'error');
+                return false;
+            }
+
             setMutatingTaskId(id);
             try {
                 await taskRepository.delete(id);
                 setTasks((prev) => prev.filter((task) => task.id !== id));
                 setTotal((prev) => Math.max(0, prev - 1));
-                if (editingTask?.id === id) {
-                    setEditingTask(null);
-                }
-                if (selectedTaskId === id) {
-                    setSelectedTaskId(null);
-                }
                 showToast('Завдання видалено', 'info');
+                return true;
             } catch (err: unknown) {
                 showToast(
                     err instanceof Error ? err.message : 'Помилка видалення завдання',
                     'error'
                 );
+                return false;
             } finally {
                 setMutatingTaskId(null);
             }
         },
-        [editingTask, selectedTaskId, showToast]
+        [isAuthenticated, showToast]
     );
-
-    const startEditing = useCallback((task: Task) => {
-        setEditingTask(task);
-    }, []);
-
-    const cancelEditing = useCallback(() => {
-        setEditingTask(null);
-    }, []);
-
-    const selectTask = useCallback((id: number) => {
-        setSelectedTaskId(id);
-    }, []);
-
-    const closeTaskDetails = useCallback(() => {
-        setSelectedTaskId(null);
-    }, []);
 
     return (
         <TaskContext.Provider
@@ -268,21 +262,14 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
                 error,
                 isSubmitting,
                 mutatingTaskId,
-                filter,
-                setFilter,
                 setPage,
                 retryFetch,
-                editingTask,
-                startEditing,
-                cancelEditing,
-                selectedTaskId,
-                selectTask,
-                closeTaskDetails,
                 addTask,
                 updateTask,
                 toggleTask,
                 deleteTask,
                 toast,
+                showToast,
                 dismissToast,
             }}
         >
