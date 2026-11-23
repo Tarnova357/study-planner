@@ -182,25 +182,33 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
 
     const toggleTask = useCallback(
         async (task: Task): Promise<void> => {
-            setMutatingTaskId(task.id);
+            const previousCompleted = task.completed;
+            const nextCompleted = !previousCompleted;
+
+            setTasks((prev) =>
+                prev.map((item) =>
+                    item.id === task.id
+                        ? { ...item, completed: nextCompleted }
+                        : item
+                )
+            );
+
             try {
-                const updated = await taskRepository.update(task.id, {
-                    completed: !task.completed,
+                await taskRepository.update(task.id, {
+                    completed: nextCompleted,
                 });
+            } catch (err: unknown) {
                 setTasks((prev) =>
                     prev.map((item) =>
                         item.id === task.id
-                            ? { ...item, completed: updated.completed }
+                            ? { ...item, completed: previousCompleted }
                             : item
                     )
                 );
-            } catch (err: unknown) {
                 showToast(
                     err instanceof Error ? err.message : 'Помилка оновлення статусу',
                     'error'
                 );
-            } finally {
-                setMutatingTaskId(null);
             }
         },
         [showToast]

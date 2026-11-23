@@ -2,15 +2,16 @@ import { useTaskContext } from '../hooks/useTaskContext';
 import './TaskStats.scss';
 
 export const TaskStats = () => {
-    const { tasks } = useTaskContext();
+    const { tasks, total } = useTaskContext();
 
-    const total = tasks.length;
+    const onPage = tasks.length;
     const completed = tasks.filter((task) => task.completed).length;
-    const uncompleted = total - completed;
+    const uncompleted = onPage - completed;
 
     return (
         <div className="task-stats">
             <div className="task-stats__item">Всього: {total}</div>
+            <div className="task-stats__item">На сторінці: {onPage}</div>
             <div className="task-stats__item">Виконано: {completed}</div>
             <div className="task-stats__item">Залишилось: {uncompleted}</div>
         </div>
